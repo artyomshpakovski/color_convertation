@@ -18,6 +18,28 @@ public:
     QGridLayout *grLayout;
 private:
 
+    double XYZ_X = 0;
+    double XYZ_Y = 0;
+    double XYZ_Z = 0;
+
+    double getX() const;
+    double getY() const;
+    double getZ() const;
+    void setX(double);
+    void setY(double);
+    void setZ(double);
+
+    double LAB_L = 0;
+    double LAB_A = 0;
+    double LAB_B = 0;
+
+    double getL() const;
+    double getA() const;
+    double getB() const;
+    void setL() const;
+    void setA() const;
+    void setB() const;
+
     void paintEvent(QPaintEvent *event);
     void color_convertation_from_QColor();
     void color_convertation_from_XYZ();

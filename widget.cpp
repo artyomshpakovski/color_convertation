@@ -1,15 +1,7 @@
 #include "widget.h"
 #include "ui_widget.h"
-#include "qDebug.h"
 
 QColor main_color; // есть цвета - HSV, RGB, CMYK
-double XYZ_X;
-double XYZ_Y;
-double XYZ_Z;
-
-double LAB_L;
-double LAB_A;
-double LAB_B;
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -152,6 +144,38 @@ Widget::~Widget()
     delete ui;
 }
 
+double Widget::getY() const
+{
+    return XYZ_Y;
+}
+
+double Widget::getX() const
+{
+    return XYZ_X;
+}
+
+double Widget::getZ() const
+{
+    return XYZ_Z;
+}
+
+void Widget::setX(double x)
+{
+    XYZ_X = x;
+}
+
+void Widget::setY(double x)
+{
+    XYZ_Y = x;
+}
+
+void Widget::setZ(double x)
+{
+    XYZ_Z = x;
+}
+
+
+
 void Widget::Names_For_LeftLabels(QString text)
 {
     leLeftFourth->hide();
@@ -186,7 +210,6 @@ void Widget::Names_For_LeftLabels(QString text)
 
 void Widget::Names_For_CenterLabels(QString text)
 {
-    // HLS, LAB
     leCenterFourth->hide();
     if (text == "RGB") {
         lbCenterFirst->setText("R:");
@@ -231,7 +254,6 @@ void Widget::Names_For_CenterLabels(QString text)
 
 void Widget::Names_For_RightLabels(QString text)
 {
-    //  HSV, RGB
     leRightFourth->hide();
     if (text == "CMYK") {
         lbRightFirst->setText("C:");
@@ -270,7 +292,7 @@ void Widget::Names_For_RightLabels(QString text)
 
 void Widget::changed_LeftFirst()
 {
-    if (lbLeftFirst->text() == "R:") {
+    if (cbLeft->currentText() == "RGB") {
         main_color.setRed(leLeftFirst->text().toInt());
         color_convertation_from_QColor();
     }
@@ -286,7 +308,7 @@ void Widget::changed_LeftFirst()
     }
 
     if (lbLeftFirst->text() == "X:") {
-        XYZ_X = leLeftFirst->text().toDouble();
+        setX(lbLeftFirst->text().toDouble());
         color_convertation_from_XYZ();
     }
 
@@ -312,7 +334,7 @@ void Widget::changed_LeftSecond()
     }
 
     if (cbCenter->currentText() == "XYZ") {
-        XYZ_Y = leLeftSecond->text().toDouble();
+        setY(lbLeftSecond->text().toDouble());
         color_convertation_from_XYZ();
     }
 
@@ -338,7 +360,7 @@ void Widget::changed_LeftThird()
     }
 
     if (lbLeftThird->text() == "Z:") {
-        XYZ_Z = leLeftThird->text().toDouble();
+        setZ(lbLeftThird->text().toDouble());
         color_convertation_from_XYZ();
     }
 
@@ -367,7 +389,7 @@ void Widget::changed_CenterFirst()
     }
 
     if (lbCenterFirst->text() == "X:") {
-        XYZ_X = leCenterFirst->text().toDouble();
+        setX(lbCenterFirst->text().toDouble());
         color_convertation_from_XYZ();
     }
 
@@ -377,8 +399,10 @@ void Widget::changed_CenterFirst()
     }
 
     if (lbCenterFirst->text() == "R:") {
-        main_color.setRed(leCenterFirst->text().toInt());
-        color_convertation_from_QColor();
+        XYZ_X = leLeftFirst->text().toDouble();
+        XYZ_Y = leLeftSecond->text().toDouble();
+        XYZ_Z = leLeftThird->text().toDouble();
+        color_convertation_from_XYZ();
     }
 
     if (cbCenter->currentText() == "HLS") {
@@ -403,7 +427,7 @@ void Widget::changed_CenterSecond()
     }
 
     if (lbCenterSecond->text() == "Y:") {
-        XYZ_Y = leCenterSecond->text().toDouble();
+        setY(lbCenterSecond->text().toDouble());
         color_convertation_from_XYZ();
     }
 
@@ -439,7 +463,7 @@ void Widget::changed_CenterThird()
     }
 
     if (cbCenter->currentText() == "XYZ") {
-        XYZ_Z = leCenterThird->text().toDouble();
+        setZ(lbCenterThird->text().toDouble());
         color_convertation_from_XYZ();
     }
 
@@ -478,7 +502,7 @@ void Widget::changed_RightFirst()
     }
 
     if (cbRight->currentText() == "HLS") { // H
-        main_color.setHsl(leRightFirst->text().toDouble(), main_color.lightness(), main_color.hslHue());
+        main_color.setHsl(leRightFirst->text().toDouble(), main_color.saturation(), main_color.lightness());
         color_convertation_from_QColor();
     }
 
@@ -583,14 +607,14 @@ void Widget::setTexteverywhere()
 
     if (cbLeft->currentText() == "HSV") {
         leLeftFirst->setText(QString::number(main_color.hue()));
-        leLeftSecond->setText(QString::number(main_color.saturationF()));
-        leLeftThird->setText(QString::number(main_color.valueF()));
+        leLeftSecond->setText(QString::number(main_color.saturation()));
+        leLeftThird->setText(QString::number(main_color.value()));
     }
 
     if (cbLeft->currentText() == "XYZ") {
-        leLeftFirst -> setText(QString::number(XYZ_X));
-        leLeftSecond -> setText(QString::number(XYZ_Y));
-        leLeftThird -> setText(QString::number(XYZ_Z));
+        leLeftFirst -> setText(QString::number(getX()));
+        leLeftSecond -> setText(QString::number(getY()));
+        leLeftThird -> setText(QString::number(getZ()));
     }
 
     if (cbLeft->currentText() == "CMYK") {
@@ -614,15 +638,15 @@ void Widget::setTexteverywhere()
     }
 
     if (cbCenter->currentText() == "XYZ") {
-        leCenterFirst -> setText(QString::number(XYZ_X));
-        leCenterSecond -> setText(QString::number(XYZ_Y));
-        leCenterThird -> setText(QString::number(XYZ_Z));
+        leCenterFirst -> setText(QString::number(getX()));
+        leCenterSecond -> setText(QString::number(getY()));
+        leCenterThird -> setText(QString::number(getZ()));
     }
 
     if (cbCenter->currentText() == "HSV") {
         leCenterFirst->setText(QString::number(main_color.hue()));
-        leCenterSecond->setText(QString::number(main_color.saturationF()));
-        leCenterThird->setText(QString::number(main_color.valueF()));
+        leCenterSecond->setText(QString::number(main_color.saturation()));
+        leCenterThird->setText(QString::number(main_color.value()));
     }
 
     if (cbCenter->currentText() == "RGB") {
@@ -658,8 +682,8 @@ void Widget::setTexteverywhere()
 
     if (cbRight->currentText() == "HSV") {
         leRightFirst->setText(QString::number(main_color.hue()));
-        leRightSecond->setText(QString::number(main_color.saturationF()));
-        leRightThird->setText(QString::number(main_color.valueF()));
+        leRightSecond->setText(QString::number(main_color.saturation()));
+        leRightThird->setText(QString::number(main_color.value()));
     }
 
     if (cbRight->currentText() == "RGB") {
@@ -709,23 +733,6 @@ QColor Widget::getPixelAt(int x, int y)
     return grab(QRect(x, y, 1, 1)).toImage().pixelColor(0,0);
 }
 
-
-bool Widget::eventFilter(QObject *watched, QEvent *event)
-{
-    if (event->type() == QEvent::MouseButtonPress && watched == GradientLabel) {
-        QMouseEvent* cur = dynamic_cast<QMouseEvent*>(event);
-        int x = cur->pos().x() + GradientLabel->x();
-        int y = cur->pos().y() + GradientLabel->y();
-        main_color = QWidget::grab(QRect(x,y,1,1)).toImage().pixelColor(0,0);
-        color_convertation_from_QColor();
-        setTexteverywhere();
-        setSlider();
-    }
-
-    return false;
-}
-
-
 double F_RGB_XYZ(double x) {
     if (x>=0.04045) {
         return pow((x+0.055)/1.055, 2.4);
@@ -741,13 +748,30 @@ double F_XYZ_LAB(double x) {
 }
 
 void Widget::color_convertation_from_QColor() {
-    XYZ_X = 0.412453*F_RGB_XYZ(main_color.red()/(double) 255)*100 + 0.357580 * F_RGB_XYZ(main_color.green()/(double) 255)*100 + 0.180423 * F_RGB_XYZ(main_color.blue()/(double) 255)*100;
-    XYZ_Y = 0.212671*F_RGB_XYZ(main_color.red()/(double) 255)*100 + 0.715160 * F_RGB_XYZ(main_color.green()/(double) 255)*100 + 0.072169 * F_RGB_XYZ(main_color.blue()/(double) 255)*100;
-    XYZ_Z = 0.019334*F_RGB_XYZ(main_color.red()/(double) 255)*100 * 0.119193 * F_RGB_XYZ(main_color.green()/(double) 255)*100 + 0.950227 * F_RGB_XYZ(main_color.blue()/(double) 255)*100;
 
-    LAB_L = 116 * F_XYZ_LAB(XYZ_Y / 100.0) - 16;
-    LAB_A = 500 * (F_XYZ_LAB(XYZ_X / 95.047) - F_XYZ_LAB(XYZ_Y / 100.0));
-    LAB_B = 200 * (F_XYZ_LAB(XYZ_Y / 100.0) - F_XYZ_LAB(XYZ_Z / 108.883));
+    double Rn = F_RGB_XYZ(main_color.red() / 255.0);
+    double Gn = F_RGB_XYZ(main_color.green() / 255.0);
+    double Bn = F_RGB_XYZ(main_color.blue() / 255.0);
+
+    double XYZ_X1 = 0.412453*Rn + 0.357580 * Gn + 0.180423 * Bn;
+    double XYZ_Y1 = 0.212671*Rn + 0.715160 * Gn + 0.072169 * Bn;
+    double XYZ_Z1 = 0.019334*Rn + 0.119193 * Gn + 0.950227 * Bn;
+
+    XYZ_X1*=100.0;
+    XYZ_Y1*=100.0;
+    XYZ_Z1*=100.0;
+
+    setX(XYZ_X1);
+    setY(XYZ_Y1);
+    setZ(XYZ_Z1);
+
+    double X = XYZ_X1 / 95.047;
+    double Y = XYZ_Y1 / 100.0;
+    double Z = XYZ_Z1 / 108.883;
+
+    LAB_L = 116 * F_XYZ_LAB(Y) - 16;
+    LAB_A = 500 * (F_XYZ_LAB(X) - F_XYZ_LAB(Y));
+    LAB_B = 200 * (F_XYZ_LAB(Y) - F_XYZ_LAB(Z));
 }
 
 double F_XYZ_RGB(double x) {
@@ -759,21 +783,34 @@ double F_XYZ_RGB(double x) {
 }
 
 void Widget::color_convertation_from_XYZ() {
-    double Rn = 3.2404542 * XYZ_X / 100.0 - 1.5371385 * XYZ_Y/ 100.0  - 0.4985314 * XYZ_Z/ 100.0 ;
-    double Gn = -0.9692660 * XYZ_X / 100.0 + 1.8760108 * XYZ_Y/ 100.0  + 0.0415560 * XYZ_Z/ 100.0 ;
-    double Bn = 0.0556434 * XYZ_X / 100.0 - 0.2040259 * XYZ_Y/ 100.0  + 1.0572252 * XYZ_Z/ 100.0 ;
 
-    double R = F_XYZ_RGB(Rn) * 255;
-    double G = F_XYZ_RGB(Gn) * 255;
-    double B = F_XYZ_RGB(Bn) * 255;
+    double X = getX();
+    double Y = getY();
+    double Z = getZ();
+
+    double Rn = 3.2404542 * X - 1.5371385 * Y  - 0.4985314 * Z;
+    double Gn = -0.9692660 * X + 1.8760108 * Y  + 0.0415560 * Z;
+    double Bn = 0.0556434 * X - 0.2040259 * Y  + 1.0572252 * Z;
+
+    Rn/=100.0;
+    Gn/=100.0;
+    Bn/=100.0;
+
+    double R = F_XYZ_RGB(Rn);
+    double G = F_XYZ_RGB(Gn);
+    double B = F_XYZ_RGB(Bn);
+
+    R*=255.0;
+    G*=255.0;
+    B*=255.0;
 
     main_color.setRed(round(R));
     main_color.setGreen(round(G));
     main_color.setBlue(round(B));
 
-    LAB_L = 116 * F_XYZ_LAB(XYZ_Y/(double) 100.0)-16;
-    LAB_A = 500 * (F_XYZ_LAB(XYZ_X/95.047)-F_XYZ_LAB(XYZ_Y/(double) 100.0));
-    LAB_B = 200 * (F_XYZ_LAB(XYZ_Y/(double) 100.0)- F_XYZ_LAB(XYZ_Z/(double) 108.883));
+    LAB_L = 116 * F_XYZ_LAB(X/(double) 100.0)-16;
+    LAB_A = 500 * (F_XYZ_LAB(X/95.047)-F_XYZ_LAB(Y/(double) 100.0));
+    LAB_B = 200 * (F_XYZ_LAB(Y/(double) 100.0)- F_XYZ_LAB(Z/(double) 108.883));
 
 }
 
@@ -785,14 +822,17 @@ double F_LAB_XYZ(double x) {
 }
 
 void Widget::color_convertation_from_LAB() {
-    XYZ_X = F_LAB_XYZ(LAB_A/500.0+(F_LAB_XYZ(LAB_L)+16.0)/116.0) * 95.047;
-    XYZ_Y = F_LAB_XYZ((LAB_L+16.0)/116.0) * 100.0;
-    XYZ_Z = F_LAB_XYZ((LAB_L+16.0)/116.0-LAB_B/200) * 108.883;
+    double XYZ_X1 = F_LAB_XYZ(LAB_A/500.0+(LAB_L+16.0)/116.0) * 95.047;
+    double XYZ_Y1 = F_LAB_XYZ((LAB_L+16.0)/116.0) * 100.0;
+    double XYZ_Z1 = F_LAB_XYZ((LAB_L+16.0)/116.0-LAB_B/200) * 108.883;
 
+    setX(XYZ_X1);
+    setY(XYZ_Y1);
+    setZ(XYZ_Z1);
 
-    double Rn = 3.2406 * XYZ_X / 100 - 1.5372 * XYZ_Y / 100 - 0.4986 * XYZ_Z / 100;
-    double Gn = -0.9689 * XYZ_X / 100 + 1.8758 * XYZ_Y / 100 + 0.0415 * XYZ_Z / 100;
-    double Bn = 0.0557 * XYZ_X / 100 - 0.2040 * XYZ_Y / 100 + 1.0570 * XYZ_Z / 100;
+    double Rn = 3.2406 * XYZ_X1 / 100 - 1.5372 * XYZ_Y1 / 100 - 0.4986 * XYZ_Z1 / 100;
+    double Gn = -0.9689 * XYZ_X1 / 100 + 1.8758 * XYZ_Y1 / 100 + 0.0415 * XYZ_Z1 / 100;
+    double Bn = 0.0557 * XYZ_X1 / 100 - 0.2040 * XYZ_Y1 / 100 + 1.0570 * XYZ_Z1 / 100;
 
     main_color.setRed(round(F_XYZ_RGB(Rn)*255));
     main_color.setGreen(round(F_XYZ_RGB(Gn)*255));
@@ -802,6 +842,7 @@ void Widget::color_convertation_from_LAB() {
 }
 
 void Widget::paintEvent(QPaintEvent *event) {
+    /*
     QWidget::paintEvent(event);
     GradientLabel->setMinimumSize(725, 250);
     GradientLabel->setMaximumSize(725, 250);
@@ -817,7 +858,36 @@ void Widget::paintEvent(QPaintEvent *event) {
     paint.setBrush(linearGradient);
     paint.drawRect(0,0,GradientLabel->width()-1, GradientLabel->height()-1);
     GradientLabel->update();
+    */
+
+    QPixmap pix(GradientLabel->width(),GradientLabel->height());
+    QPixmap pix2(GradientLabel->width(),GradientLabel->height());
+    QPainter painter(&pix);
+    QPainter painter2(&pix2);
+    QLinearGradient gradl(0,0,pix.width(),0);
+    gradl.setColorAt(0,Qt::red);
+    gradl.setColorAt(0.18,Qt::yellow);
+    gradl.setColorAt(0.36,Qt::green);
+    gradl.setColorAt(0.54,Qt::blue);
+    gradl.setColorAt(0.8,Qt::darkBlue);
+    gradl.setColorAt(1,Qt::magenta);
+    painter.setBrush(gradl);
+    painter.drawRect(0,0,GradientLabel->width(),GradientLabel->height());
+    GradientLabel->setPixmap(pix);
 }
 
+bool Widget::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::MouseButtonPress && watched == GradientLabel) {
+        QMouseEvent* cur = dynamic_cast<QMouseEvent*>(event);
+        int x = cur->pos().x() + GradientLabel->x();
+        int y = cur->pos().y() + GradientLabel->y();
+        main_color = QWidget::grab(QRect(x,y,1,1)).toImage().pixelColor(0,0);
+        setTexteverywhere();
+        setSlider();
+    }
+
+    return false;
+}
 
 
