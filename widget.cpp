@@ -712,18 +712,16 @@ QColor Widget::getPixelAt(int x, int y)
 
 bool Widget::eventFilter(QObject *watched, QEvent *event)
 {
-    if (watched ==  GradientLabel) {
-              QEvent::Type type = event->type();
-              if (type == QEvent::MouseButtonPress) {
-                QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-                QColor temp = getPixelAt(mouseEvent->pos().x(), mouseEvent->pos().y());
-                main_color = temp;
-                color_convertation_from_QColor();
-                setTexteverywhere();
-                setSlider();
-              }
-          }
-    return QWidget::eventFilter(watched, event);
+    if (event->type() == QEvent::MouseButtonPress && watched == GradientLabel) {
+        QMouseEvent* cur = dynamic_cast<QMouseEvent*>(event);
+        int x = cur->pos().x() + GradientLabel->x();
+        int y = cur->pos().y() + GradientLabel->y();
+        main_color = QWidget::grab(QRect(x,y,1,1)).toImage().pixelColor(0,0);
+        color_convertation_from_QColor();
+        setTexteverywhere();
+    }
+
+    return false;
 }
 
 
@@ -799,9 +797,8 @@ double F_LAB_XYZ(double x) {
 }
 
 void Widget::color_convertation_from_LAB() {
-    // тут за основу берется изменений полей LAB, для удобства будем изменть все оставшиеся цветовые модели
-    XYZ_X = F_LAB_XYZ(LAB_A/500.0+(F_LAB_XYZ(LAB_L)+16.0)/116.0) * 100;
-    XYZ_Y = F_LAB_XYZ((LAB_L+16.0)/116.0) * 95.047;
+    XYZ_X = F_LAB_XYZ(LAB_A/500.0+(F_LAB_XYZ(LAB_L)+16.0)/116.0) * 95.047;
+    XYZ_Y = F_LAB_XYZ((LAB_L+16.0)/116.0) * 100.0;
     XYZ_Z = F_LAB_XYZ((LAB_L+16.0)/116.0-LAB_B/200) * 108.883;
 
 
