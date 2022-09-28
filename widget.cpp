@@ -716,17 +716,15 @@ bool Widget::eventFilter(QObject *watched, QEvent *event)
               QEvent::Type type = event->type();
               if (type == QEvent::MouseButtonPress) {
                 QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-                QColor temp = grab(QRect(mouseEvent->pos().x(), mouseEvent->pos().y(), 1, 1)).toImage().pixelColor(0,0);
+                QColor temp = getPixelAt(mouseEvent->pos().x(), mouseEvent->pos().y());
                 main_color = temp;
                 color_convertation_from_QColor();
                 setTexteverywhere();
                 setSlider();
               }
           }
-
-          return QWidget::eventFilter(watched, event);
+    return QWidget::eventFilter(watched, event);
 }
-
 
 
 double F_RGB_XYZ(double x) {
@@ -819,6 +817,8 @@ void Widget::color_convertation_from_LAB() {
 }
 
 void Widget::paintEvent(QPaintEvent *event) {
+
+    QWidget::paintEvent(event);
 
     GradientLabel->setMinimumSize(725, 250);
     GradientLabel->setMaximumSize(725, 250);
