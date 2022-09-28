@@ -1,6 +1,6 @@
 #include "widget.h"
 #include "ui_widget.h"
-#include <qDebug>
+#include "qDebug.h"
 
 QColor main_color; // есть цвета - HSV, RGB, CMYK
 double XYZ_X;
@@ -719,6 +719,7 @@ bool Widget::eventFilter(QObject *watched, QEvent *event)
         main_color = QWidget::grab(QRect(x,y,1,1)).toImage().pixelColor(0,0);
         color_convertation_from_QColor();
         setTexteverywhere();
+        setSlider();
     }
 
     return false;
@@ -740,24 +741,13 @@ double F_XYZ_LAB(double x) {
 }
 
 void Widget::color_convertation_from_QColor() {
-    // тут за основу берем RGB, так как с него намного проще конвертировать в другие цветовые модели
-    // следовательно, при изменении полей, связанных с CMYK, HSV, RGB будет вызываться данный метод
-    // так как в переменной QColor уже будут автоматически изменяться значения для полей CMYK, RGB, HSV их пересчет нас не затрагивает
-
-    // перевод в XYZ
-
     XYZ_X = 0.412453*F_RGB_XYZ(main_color.red()/(double) 255)*100 + 0.357580 * F_RGB_XYZ(main_color.green()/(double) 255)*100 + 0.180423 * F_RGB_XYZ(main_color.blue()/(double) 255)*100;
     XYZ_Y = 0.212671*F_RGB_XYZ(main_color.red()/(double) 255)*100 + 0.715160 * F_RGB_XYZ(main_color.green()/(double) 255)*100 + 0.072169 * F_RGB_XYZ(main_color.blue()/(double) 255)*100;
     XYZ_Z = 0.019334*F_RGB_XYZ(main_color.red()/(double) 255)*100 * 0.119193 * F_RGB_XYZ(main_color.green()/(double) 255)*100 + 0.950227 * F_RGB_XYZ(main_color.blue()/(double) 255)*100;
 
-    // перевод в LAB
-
     LAB_L = 116 * F_XYZ_LAB(XYZ_Y / 100.0) - 16;
     LAB_A = 500 * (F_XYZ_LAB(XYZ_X / 95.047) - F_XYZ_LAB(XYZ_Y / 100.0));
     LAB_B = 200 * (F_XYZ_LAB(XYZ_Y / 100.0) - F_XYZ_LAB(XYZ_Z / 108.883));
-
-    // перевод в HLS
-
 }
 
 double F_XYZ_RGB(double x) {
@@ -769,11 +759,9 @@ double F_XYZ_RGB(double x) {
 }
 
 void Widget::color_convertation_from_XYZ() {
-    // тут за основу берется изменения полей XYZ, для удобства будем изменять все оставшиеся цветовые модели
     double Rn = 3.2404542 * XYZ_X / 100.0 - 1.5371385 * XYZ_Y/ 100.0  - 0.4985314 * XYZ_Z/ 100.0 ;
     double Gn = -0.9692660 * XYZ_X / 100.0 + 1.8760108 * XYZ_Y/ 100.0  + 0.0415560 * XYZ_Z/ 100.0 ;
     double Bn = 0.0556434 * XYZ_X / 100.0 - 0.2040259 * XYZ_Y/ 100.0  + 1.0572252 * XYZ_Z/ 100.0 ;
-
 
     double R = F_XYZ_RGB(Rn) * 255;
     double G = F_XYZ_RGB(Gn) * 255;
@@ -814,9 +802,7 @@ void Widget::color_convertation_from_LAB() {
 }
 
 void Widget::paintEvent(QPaintEvent *event) {
-
     QWidget::paintEvent(event);
-
     GradientLabel->setMinimumSize(725, 250);
     GradientLabel->setMaximumSize(725, 250);
     QPixmap Grad(GradientLabel->width(), GradientLabel->height());
