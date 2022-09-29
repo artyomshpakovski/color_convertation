@@ -837,8 +837,6 @@ void Widget::color_convertation_from_LAB() {
     main_color.setRed(round(F_XYZ_RGB(Rn)*255));
     main_color.setGreen(round(F_XYZ_RGB(Gn)*255));
     main_color.setBlue(round(F_XYZ_RGB(Bn)*255));
-
-    setTexteverywhere();
 }
 
 void Widget::paintEvent(QPaintEvent *event) {
