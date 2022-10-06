@@ -13,8 +13,8 @@ Widget::Widget(QWidget *parent)
     grLayout = new QGridLayout(this);
     qApp->installEventFilter(this);
     grLayout->setAlignment(Qt::AlignLeft);
-    setMinimumSize(750,500);
-    setMaximumSize(750, 500);
+    setMinimumSize(725,500);
+    setMaximumSize(725, 500);
     cbLeft = new QComboBox();
     cbCenter = new QComboBox();
     cbRight = new QComboBox();
